@@ -48,15 +48,27 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
      * @requires IS_BST(t)
      * @ensures isInTree = (x is in labels(t))
      */
-    private static <T extends Comparable<T>> boolean isInTree(BinaryTree<T> t,
-            T x) {
+    private static <T extends Comparable<T>> boolean isInTree(BinaryTree<T> t, T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
+        boolean flag = false;
+        if (t.size() > 0) {
+            BinaryTree<T> left = t.newInstance();
+            BinaryTree<T> right = t.newInstance();
+            T root = t.disassemble(left, right);
+            if (root.equals(x)) {
+                flag = true;
+            } else if (x.compareTo(root) < 0) {
 
-        // TODO - fill in body
+                flag = isInTree(left, x);
+            } else {
+                flag = isInTree(right, x);
+            }
+            t.assemble(root, left, right);
+        }
 
         // This line added just to make the component compilable.
-        return false;
+        return flag;
     }
 
     /**
@@ -73,13 +85,29 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
      * @requires IS_BST(t) and x is not in labels(t)
      * @ensures IS_BST(t) and labels(t) = labels(#t) union {x}
      */
-    private static <T extends Comparable<T>> void insertInTree(BinaryTree<T> t,
-            T x) {
+    private static <T extends Comparable<T>> void insertInTree(BinaryTree<T> t, T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
 
-        // TODO - fill in body
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
 
+        if (t.size() == 0) {
+
+            t.assemble(x, left, right);
+
+        } else {
+
+            T root = t.disassemble(left, right);
+
+            if (x.compareTo(root) < 0) {
+                insertInTree(left, x);
+            } else {
+                insertInTree(right, x);
+            }
+
+            t.assemble(root, left, right);
+        }
     }
 
     /**
@@ -125,8 +153,7 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
      *  labels(t) = labels(#t) \ {x}
      * </pre>
      */
-    private static <T extends Comparable<T>> T removeFromTree(BinaryTree<T> t,
-            T x) {
+    private static <T extends Comparable<T>> T removeFromTree(BinaryTree<T> t, T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
         assert t.size() > 0 : "Violation of: x is in labels(t)";
@@ -183,8 +210,8 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
     public final void transferFrom(Set<T> source) {
         assert source != null : "Violation of: source is not null";
         assert source != this : "Violation of: source is not this";
-        assert source instanceof Set3a<?> : ""
-                + "Violation of: source is of dynamic type Set3<?>";
+        assert source instanceof Set3a<?>
+                : "" + "Violation of: source is of dynamic type Set3<?>";
         /*
          * This cast cannot fail since the assert above would have stopped
          * execution in that case: source must be of dynamic type Set3a<?>, and
