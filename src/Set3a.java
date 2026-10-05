@@ -1,6 +1,7 @@
 import java.util.Iterator;
 
 import components.binarytree.BinaryTree;
+import components.binarytree.BinaryTree1;
 import components.set.Set;
 import components.set.SetSecondary;
 
@@ -130,9 +131,21 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
         assert t.size() > 0 : "Violation of: |t| > 0";
 
         // TODO - fill in body
+        T rv;
+
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
+        T root = t.disassemble(left, right);
+        if (left.size() == 0) {
+            rv = root;
+            t.transferFrom(right);
+        } else {
+            rv = removeSmallest(left);
+            t.assemble(root, left, right);
+        }
 
         // This line added just to make the component compilable.
-        return null;
+        return rv;
     }
 
     /**
@@ -158,10 +171,32 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
         assert x != null : "Violation of: x is not null";
         assert t.size() > 0 : "Violation of: x is in labels(t)";
 
-        // TODO - fill in body
+        T rv = null;
 
-        // This line added just to make the component compilable.
-        return null;
+        BinaryTree<T> left = t.newInstance();
+        BinaryTree<T> right = t.newInstance();
+
+        T root = t.disassemble(left, right);
+        if (root.equals(x)) {
+            rv = root;
+            if (left.size() == 0) {
+                t.transferFrom(right);
+
+            } else if (right.size() == 0) {
+                t.transferFrom(left);
+            } else {
+                T newRoot = removeSmallest(right);
+                t.assemble(newRoot, left, right);
+            }
+        } else if (x.compareTo(root) < 0) {
+            rv = removeFromTree(left, x);
+            t.assemble(root, left, right);
+        } else {
+            rv = removeFromTree(right, x);
+            t.assemble(root, left, right);
+        }
+
+        return rv;
     }
 
     /**
@@ -169,8 +204,7 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
      */
     private void createNewRep() {
 
-        // TODO - fill in body
-
+        this.tree = new BinaryTree1<T>();
     }
 
     /*
@@ -182,7 +216,7 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
      */
     public Set3a() {
 
-        // TODO - fill in body
+        this.createNewRep();
 
     }
 
@@ -231,7 +265,7 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
         assert x != null : "Violation of: x is not null";
         assert !this.contains(x) : "Violation of: x is not in this";
 
-        // TODO - fill in body
+        insertInTree(this.tree, x);
 
     }
 
@@ -240,39 +274,40 @@ public class Set3a<T extends Comparable<T>> extends SetSecondary<T> {
         assert x != null : "Violation of: x is not null";
         assert this.contains(x) : "Violation of: x is in this";
 
-        // TODO - fill in body
+        return removeFromTree(this.tree, x);
 
-        // This line added just to make the component compilable.
-        return null;
     }
 
     @Override
     public final T removeAny() {
         assert this.size() > 0 : "Violation of: this /= empty_set";
 
-        // TODO - fill in body
+        BinaryTree<T> left = this.tree.newInstance();
+        BinaryTree<T> right = this.tree.newInstance();
 
-        // This line added just to make the component compilable.
-        return null;
+        T root = this.tree.disassemble(left, right);
+
+        this.tree.assemble(root, left, right);
+
+        T removed = removeFromTree(this.tree, root);
+
+        return removed;
     }
 
     @Override
     public final boolean contains(T x) {
         assert x != null : "Violation of: x is not null";
 
-        // TODO - fill in body
+        boolean flag = isInTree(this.tree, x);
 
         // This line added just to make the component compilable.
-        return false;
+        return flag;
     }
 
     @Override
     public final int size() {
 
-        // TODO - fill in body
-
-        // This line added just to make the component compilable.
-        return 0;
+        return this.tree.size();
     }
 
     @Override
