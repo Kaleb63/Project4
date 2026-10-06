@@ -1,0 +1,6 @@
+# Eclipse compiler output
+bin/
+*.class
+
+# macOS
+.DS_Store
